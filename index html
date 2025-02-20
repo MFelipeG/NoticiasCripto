@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CriptoNews - Últimas Notícias de Criptomoedas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #1e1e2f;
+      color: #fff;
+    }
+    header {
+      background-color: #282a36;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+      color: #50fa7b;
+    }
+    .news-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .news-item {
+      background-color: #44475a;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .news-item h2 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    .news-item p {
+      font-size: 1em;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #282a36;
+      color: #6272a4;
+    }
+    footer a {
+      color: #50fa7b;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CriptoNews</h1>
+    <p>As últimas notícias do mundo das criptomoedas, atualizadas em tempo real!</p>
+  </header>
+
+  <div class="news-container" id="news-container">
+    <!-- Notícias serão carregadas aqui -->
+  </div>
+
+  <footer>
+    <p>Desenvolvido por [Seu Nome] | Fontes de notícias de parceiros confiáveis como CoinDesk, CoinTelegraph e Investing.com.</p>
+  </footer>
+
+  <script>
+    const newsContainer = document.getElementById('news-container');
+
+    async function fetchNews() {
+      try {
+        // Simulação de fontes de notícias
+        const sources = [
+          "https://br.cointelegraph.com",
+          "https://www.coindesk.com/pt-br",
+          "https://pt.investing.com/news/cryptocurrency-news"
+        ];
+
+        // Atualização (simulada) das notícias
+        newsContainer.innerHTML = ''; // Limpa as notícias antigas
+        sources.forEach((source, index) => {
+          const newsItem = document.createElement('div');
+          newsItem.classList.add('news-item');
+          newsItem.innerHTML = `
+            <h2>Notícia ${index + 1} de ${source}</h2>
+            <p>Resumo da notícia ${index + 1}. Acesse a fonte para mais detalhes.</p>
+            <a href="${source}" target="_blank">Leia mais</a>
+          `;
+          newsContainer.appendChild(newsItem);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar as notícias:", error);
+        newsContainer.innerHTML = '<p>Erro ao carregar as notícias. Tente novamente mais tarde.</p>';
+      }
+    }
+
+    // Atualiza as notícias a cada 5 minutos
+    fetchNews();
+    setInterval(fetchNews, 300000); // Atualiza a cada 5 minutos (300000ms)
+  </script>
+</body>
+</html>
