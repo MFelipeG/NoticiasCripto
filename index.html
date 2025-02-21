@@ -30,29 +30,8 @@
       color: #f8f8f8;
     }
 
-    .prices-container,
     .news-container {
       padding: 20px;
-    }
-
-    .prices-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-
-    .price-card {
-      background-color: #1e1e2f;
-      padding: 15px;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .price-card h2 {
-      margin-bottom: 10px;
-    }
-
-    .news-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
@@ -88,59 +67,31 @@
 <body>
   <header>
     <h1>CriptoNews</h1>
-    <p>Preços em tempo real e as últimas notícias sobre criptomoedas!</p>
+    <p>As últimas notícias sobre criptomoedas, atualizadas em tempo real!</p>
   </header>
-
-  <div class="prices-container" id="prices-container">
-    <!-- Preços das criptomoedas serão carregados aqui -->
-  </div>
 
   <div class="news-container" id="news-container">
     <!-- Notícias serão carregadas aqui -->
   </div>
 
   <footer>
-    <p>Desenvolvido por [Marlon Felipe] | Dados fornecidos por Coinbase e NewsAPI.</p>
+    <p>Desenvolvido por [Seu Nome] | Dados fornecidos pela NewsAPI.</p>
   </footer>
 
   <script>
-    const pricesContainer = document.getElementById('prices-container');
     const newsContainer = document.getElementById('news-container');
 
-    // Chaves de API (7ed9d1ca560a416aa288f4236e24191e)
-    const COINBASE_API_URL = 'https://api.coinbase.com/v2/prices';
+    // Sua chave da NewsAPI
     const NEWS_API_KEY = '7ed9d1ca560a416aa288f4236e24191e';
-    
-    // Função para buscar preços de criptomoedas
-    async function fetchCryptoPrices() {
-      try {
-        const btcResponse = await fetch(`${COINBASE_API_URL}/BTC-USD/spot`);
-        const ethResponse = await fetch(`${COINBASE_API_URL}/ETH-USD/spot`);
-        const btcData = await btcResponse.json();
-        const ethData = await ethResponse.json();
-
-        // Renderiza os preços
-        pricesContainer.innerHTML = `
-          <div class="price-card">
-            <h2>Bitcoin (BTC)</h2>
-            <p>Preço Atual: $${btcData.data.amount}</p>
-          </div>
-          <div class="price-card">
-            <h2>Ethereum (ETH)</h2>
-            <p>Preço Atual: $${ethData.data.amount}</p>
-          </div>`;
-        
-      } catch (error) {
-        console.error('Erro ao buscar preços:', error);
-        pricesContainer.innerHTML = '<p>Erro ao carregar preços. Tente novamente mais tarde.</p>';
-      }
-    }
 
     // Função para buscar notícias sobre criptomoedas
     async function fetchCryptoNews() {
       try {
         const response = await fetch(`https://newsapi.org/v2/everything?q=cryptocurrency&language=pt&sortBy=publishedAt&apiKey=${NEWS_API_KEY}`);
+        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+        
         const data = await response.json();
+        if (!data.articles || data.articles.length === 0) throw new Error('Nenhuma notícia encontrada.');
 
         // Renderiza as notícias
         newsContainer.innerHTML = data.articles.slice(0, 6).map(article => `
@@ -152,17 +103,15 @@
           </div>`).join('');
         
       } catch (error) {
-        console.error('Erro ao buscar notícias:', error);
-        newsContainer.innerHTML = '<p>Erro ao carregar notícias. Tente novamente mais tarde.</p>';
+        console.error(error);
+        newsContainer.innerHTML = `<p>${error.message}</p>`;
       }
     }
 
-    // Atualiza os dados automaticamente
-    fetchCryptoPrices();
+    // Atualiza as notícias automaticamente
     fetchCryptoNews();
     
-    setInterval(fetchCryptoPrices, 300000); // Atualiza preços a cada 5 minutos
-    setInterval(fetchCryptoNews, 300000); // Atualiza notícias a cada 5 minutos
+    setInterval(fetchCryptoNews, 300000); // Atualiza a cada 5 minutos
   </script>
 </body>
 </html>
