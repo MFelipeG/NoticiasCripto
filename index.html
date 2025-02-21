@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CriptoNews - Últimas Notícias e Preços</title>
+  <title>CriptoNews - Últimas Notícias</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -67,7 +67,7 @@
 <body>
   <header>
     <h1>CriptoNews</h1>
-    <p>As últimas notícias sobre criptomoedas, atualizadas em tempo real!</p>
+    <p>As últimas notícias sobre criptomoedas, atualizadas automaticamente!</p>
   </header>
 
   <div class="news-container" id="news-container">
@@ -75,43 +75,57 @@
   </div>
 
   <footer>
-    <p>Desenvolvido por [Seu Nome] | Dados fornecidos pela NewsAPI.</p>
+    <p>Desenvolvido por [Marlon Felipe] | Fontes de dados fornecidas por CoinDesk e CoinTelegraph.</p>
   </footer>
 
   <script>
     const newsContainer = document.getElementById('news-container');
 
-    // Sua chave da NewsAPI
-    const NEWS_API_KEY = '7ed9d1ca560a416aa288f4236e24191e';
+    // URLs dos Feeds RSS
+    const RSS_FEEDS = [
+      'https://www.coindesk.com/arc/outboundfeeds/rss/', // CoinDesk
+      'https://cointelegraph.com/rss' // CoinTelegraph
+    ];
 
-    // Função para buscar notícias sobre criptomoedas
-    async function fetchCryptoNews() {
+    // Função para buscar e processar os feeds RSS
+    async function fetchRSSFeeds() {
       try {
-        const response = await fetch(`https://newsapi.org/v2/everything?q=cryptocurrency&language=pt&sortBy=publishedAt&apiKey=${NEWS_API_KEY}`);
-        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
-        
-        const data = await response.json();
-        if (!data.articles || data.articles.length === 0) throw new Error('Nenhuma notícia encontrada.');
+        newsContainer.innerHTML = '<p>Carregando notícias...</p>';
 
-        // Renderiza as notícias
-        newsContainer.innerHTML = data.articles.slice(0, 6).map(article => `
+        const allNews = [];
+
+        for (const feed of RSS_FEEDS) {
+          const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${feed}`);
+          const data = await response.json();
+
+          if (data.items && data.items.length > 0) {
+            allNews.push(...data.items);
+          }
+        }
+
+        // Ordena as notícias pela data
+        allNews.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+        // Renderiza as notícias no site
+        newsContainer.innerHTML = allNews.slice(0, 10).map(article => `
           <div class="news-item">
-            <img src="${article.urlToImage || 'https://via.placeholder.com/300x200'}" alt="Imagem da notícia">
+            <img src="${article.enclosure?.link || 'https://via.placeholder.com/300x200'}" alt="Imagem da notícia">
             <h3>${article.title}</h3>
             <p>${article.description || 'Nenhuma descrição disponível.'}</p>
-            <a href="${article.url}" target="_blank">Leia mais</a>
+            <a href="${article.link}" target="_blank">Leia mais</a>
           </div>`).join('');
         
       } catch (error) {
-        console.error(error);
-        newsContainer.innerHTML = `<p>${error.message}</p>`;
+        console.error('Erro ao carregar os feeds RSS:', error);
+        newsContainer.innerHTML = '<p>Erro ao carregar as notícias. Tente novamente mais tarde.</p>';
       }
     }
 
-    // Atualiza as notícias automaticamente
-    fetchCryptoNews();
-    
-    setInterval(fetchCryptoNews, 300000); // Atualiza a cada 5 minutos
+    // Carrega os feeds RSS ao iniciar o site
+    fetchRSSFeeds();
+
+    // Atualiza os feeds a cada 5 minutos
+    setInterval(fetchRSSFeeds, 300000); // Atualiza a cada 5 minutos
   </script>
 </body>
 </html>
